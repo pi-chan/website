@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Async | xoyipメモ置き場]]></title>
+  <link href="http://site.piyox.info/blog/categories/async/atom.xml" rel="self"/>
+  <link href="http://site.piyox.info/"/>
+  <updated>2014-04-22T15:05:10+09:00</updated>
+  <id>http://site.piyox.info/</id>
+  <author>
+    <name><![CDATA[xoyip]]></name>
+    <email><![CDATA[xoyip@piyox.info]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Androidで遅延実行。iOSのPerformSelectorみたいなやつ]]></title>
+    <link href="http://site.piyox.info/blog/2014/04/22/android-post-delay/"/>
+    <updated>2014-04-22T14:55:43+09:00</updated>
+    <id>http://site.piyox.info/blog/2014/04/22/android-post-delay</id>
+    <content type="html"><![CDATA[<p>```java
+import android.os.Handler; // import java.util.logging.Handler;ではない！！</p>
+
+<p>public class MainActivity extends ActionBarActivity {</p>
+
+<pre><code>@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+
+    Button b = (Button)findViewById(R.id.button_action);
+    b.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    Log.d("MainActivity", "Run!");
+                }
+            };
+
+            // Runnable, Millisecond
+            new Handler().postDelayed(task, 1000);
+            Log.d("MainActivity", "Button Clicked");
+        }
+    });
+}
+</code></pre>
+
+<p>}
+```</p>
+]]></content>
+  </entry>
+  
+</feed>
