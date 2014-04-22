@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: UI | xoyipメモ置き場]]></title>
+  <link href="http://site.piyox.info/blog/categories/ui/atom.xml" rel="self"/>
+  <link href="http://site.piyox.info/"/>
+  <updated>2014-04-22T11:12:52+09:00</updated>
+  <id>http://site.piyox.info/</id>
+  <author>
+    <name><![CDATA[xoyip]]></name>
+    <email><![CDATA[xoyip@piyox.info]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[ボタンを押したときにコードを実行する]]></title>
+    <link href="http://site.piyox.info/blog/2014/04/21/android-activity/"/>
+    <updated>2014-04-21T20:47:12+09:00</updated>
+    <id>http://site.piyox.info/blog/2014/04/21/android-activity</id>
+    <content type="html"><![CDATA[<p>Androidをさわり始めた。</p>
+
+<p><code>xml
+&lt;Button
+  android:text="Button"
+  android:id="@+id/button"
+  android:layout_height="wrap_content"
+  android:layout_width="match_parent"
+/&gt;
+</code></p>
+
+<p>```java
+@Override
+public void onClick(View v) {
+  if (v.getId() == R.id.button) {</p>
+
+<pre><code>Toast.makeText(ButtonOnClick.this, "Hello! Android!!", Toast.LENGTH_LONG).show();
+</code></pre>
+
+<p>  }
+}
+```</p>
+]]></content>
+  </entry>
+  
+</feed>

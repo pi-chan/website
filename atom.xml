@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[xoyipメモ置き場]]></title>
+  <link href="http://site.piyox.info/atom.xml" rel="self"/>
+  <link href="http://site.piyox.info/"/>
+  <updated>2014-04-22T11:12:52+09:00</updated>
+  <id>http://site.piyox.info/</id>
+  <author>
+    <name><![CDATA[xoyip]]></name>
+    <email><![CDATA[xoyip@piyox.info]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[ボタンを押したときにコードを実行する]]></title>
+    <link href="http://site.piyox.info/blog/2014/04/21/android-activity/"/>
+    <updated>2014-04-21T20:47:12+09:00</updated>
+    <id>http://site.piyox.info/blog/2014/04/21/android-activity</id>
+    <content type="html"><![CDATA[<p>Androidをさわり始めた。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;Button</span>
+</span><span class='line'>  <span class="na">android:text=</span><span class="s">&quot;Button&quot;</span>
+</span><span class='line'>  <span class="na">android:id=</span><span class="s">&quot;@+id/button&quot;</span>
+</span><span class='line'>  <span class="na">android:layout_height=</span><span class="s">&quot;wrap_content&quot;</span>
+</span><span class='line'>  <span class="na">android:layout_width=</span><span class="s">&quot;match_parent&quot;</span>
+</span><span class='line'><span class="nt">/&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onClick</span><span class="o">(</span><span class="n">View</span> <span class="n">v</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">v</span><span class="o">.</span><span class="na">getId</span><span class="o">()</span> <span class="o">==</span> <span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">button</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">Toast</span><span class="o">.</span><span class="na">makeText</span><span class="o">(</span><span class="n">ButtonOnClick</span><span class="o">.</span><span class="na">this</span><span class="o">,</span> <span class="s">&quot;Hello! Android!!&quot;</span><span class="o">,</span> <span class="n">Toast</span><span class="o">.</span><span class="na">LENGTH_LONG</span><span class="o">).</span><span class="na">show</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+</feed>
