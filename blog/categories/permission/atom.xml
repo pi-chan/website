@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Permission | xoyipメモ置き場]]></title>
+  <link href="http://site.piyox.info/blog/categories/permission/atom.xml" rel="self"/>
+  <link href="http://site.piyox.info/"/>
+  <updated>2014-04-23T14:29:20+09:00</updated>
+  <id>http://site.piyox.info/</id>
+  <author>
+    <name><![CDATA[xoyip]]></name>
+    <email><![CDATA[xoyip@piyox.info]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Android端末の写真をコードから削除]]></title>
+    <link href="http://site.piyox.info/blog/2014/04/23/android-delete-photo/"/>
+    <updated>2014-04-23T14:25:57+09:00</updated>
+    <id>http://site.piyox.info/blog/2014/04/23/android-delete-photo</id>
+    <content type="html"><![CDATA[<h1>パーミッションが必要</h1>
+
+<p>これ超ハマった</p>
+
+<p>```xml
+<manifest></p>
+
+<pre><code>&lt;application&gt;
+&lt;/application&gt;
+
+&lt;!-- これ！ --&gt;
+&lt;uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /&gt;
+</code></pre>
+
+<p></manifest>
+```</p>
+
+<h1>コード</h1>
+
+<p>```java
+public class MainActivity extends ActionBarActivity {</p>
+
+<pre><code>@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+
+    // ボタンクリックで写真選択へ
+    Button b = (Button)findViewById(R.id.button_open);
+    b.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_PICK);
+            startActivityForResult(intent, 0);
+        }
+    });
+}
+
+@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (requestCode == 0 &amp;&amp; resultCode == RESULT_OK) {
+        try {
+            getContentResolver().delete(data.getData(), null, null);
+        } catch (Exception e){
+            Log.d("MainActivity", e.getMessage());
+        }
+    }
+}
+</code></pre>
+
+<p>}
+```</p>
+]]></content>
+  </entry>
+  
+</feed>
