@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Java | xoyipメモ置き場]]></title>
   <link href="http://site.piyox.info/blog/categories/java/atom.xml" rel="self"/>
   <link href="http://site.piyox.info/"/>
-  <updated>2014-04-22T16:20:32+09:00</updated>
+  <updated>2014-04-23T12:40:57+09:00</updated>
   <id>http://site.piyox.info/</id>
   <author>
     <name><![CDATA[xoyip]]></name>
@@ -12,6 +12,186 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Androidバックグラウンドでの定期処理]]></title>
+    <link href="http://site.piyox.info/blog/2014/04/23/android-alarm-service/"/>
+    <updated>2014-04-23T12:27:44+09:00</updated>
+    <id>http://site.piyox.info/blog/2014/04/23/android-alarm-service</id>
+    <content type="html"><![CDATA[<p>Androidでバックグランド処理を実行する方法。ここが簡潔にまとまっていていい。</p>
+
+<p><a href="http://android.keicode.com/basics/services-schedule-with-alarmmanager.php">AlarmService を利用したサービス実行のスケジューリング &ndash; Android 開発入門</a></p>
+
+<h1>サービスを登録・解除する画面</h1>
+
+<p>```java
+// MainActivity.java</p>
+
+<p>AlarmManager mManager;
+final static String TAG = &ldquo;AlarmService&rdquo;;</p>
+
+<p>// サービスの登録・解除で共通の処理
+private PendingIntent pendingIntent() {</p>
+
+<pre><code>Context context = getBaseContext();
+Intent intent = new Intent(context, AlarmService.class);
+PendingIntent pi = PendingIntent.getService(
+  context, -1, 
+  intent, PendingIntent.FLAG_UPDATE_CURRENT
+);
+return pi;
+</code></pre>
+
+<p>}</p>
+
+<p>// サービスを登録するときに呼び出せばOK
+private void scheduleService(){</p>
+
+<pre><code>mManager.setInexactRepeating(
+        AlarmManager.RTC,
+        System.currentTimeMillis(),
+        AlarmManager.INTERVAL_HOUR, // 1時間毎に呼び出す
+        pendingIntent()
+);
+</code></pre>
+
+<p>}</p>
+
+<p>// サービスを解除したいときに呼び出す
+private void cancelService(){</p>
+
+<pre><code>mManager.cancel(pendingIntent());
+</code></pre>
+
+<p>}
+```</p>
+
+<h1>サービス本体</h1>
+
+<p>```java
+// AlarmService.java</p>
+
+<p>public class AlarmService extends IntentService {</p>
+
+<pre><code>final static String TAG = "AlarmService";
+
+public AlarmService(){
+    super(TAG);
+}
+
+@Override
+protected void onHandleIntent(Intent intent) {
+    Log.d(TAG, "onHandleIntent");
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<h1>AndroidManifest.xml</h1>
+
+<p>AndroidManifest.xmlにサービスについて記載が必要なので、</p>
+
+<p>```xml
+<application></p>
+
+<pre><code>&lt;activity&gt;
+&lt;/activity&gt;
+&lt;service android:name=".AlarmService" /&gt; &lt;!-- この行！ --&gt;
+</code></pre>
+
+<p></application>
+```</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Androidで通知からアプリを起動する方法]]></title>
+    <link href="http://site.piyox.info/blog/2014/04/22/android-pending-intent/"/>
+    <updated>2014-04-22T16:41:08+09:00</updated>
+    <id>http://site.piyox.info/blog/2014/04/22/android-pending-intent</id>
+    <content type="html"><![CDATA[<p>  通知オブジェクトを作る際に<code>PendingIntent</code>を絡めておけば良い。</p>
+
+<p>```java
+Intent intent = new Intent(MainActivity.this, MainActivity.class);
+PendingIntent pi = PendingIntent.getActivity(MainActivity.this, 0, intent, Intent.FLAG_ACTIVITY_NEW_TASK);</p>
+
+<p>// notification
+NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);</p>
+
+<p>Notification n = new Notification.Builder(MainActivity.this)</p>
+
+<pre><code>    .setContentTitle("I'm xoyip")
+    .setContentText("Notification From XOYIP!")
+    .setSmallIcon(R.drawable.ic_launcher)
+    .setContentIntent(pi)
+    .build();
+</code></pre>
+
+<p>nm.notify(uniq_number, n);
+```</p>
+
+<p>ただしこれだけだと通知から起動するときに既存のアクティビティがあったとしても、新たなアクティビティが生成される仕組みになっているので<code>AndroidManifest.xml</code>でアクティビティの設定を変えてあげる必要がある。</p>
+
+<p><code>android:launchMode</code>を<code>singleTop</code>などにすれば既存のアクティビティが再利用されるっぽい。</p>
+
+<p>```xml
+&lt;activity</p>
+
+<pre><code>android:name="com.xoyip.app.MainActivity"
+android:label="@string/app_name"
+android:launchMode="singleTop"&gt;
+&lt;intent-filter&gt;
+    &lt;action android:name="android.intent.action.MAIN" /&gt;
+
+    &lt;category android:name="android.intent.category.LAUNCHER" /&gt;
+&lt;/intent-filter&gt;
+</code></pre>
+
+<p></activity>
+```</p>
+
+<h1>参考</h1>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th> Constant       </th>
+<th> Value </th>
+<th> Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td> standard       </td>
+<td> 0     </td>
+<td> The default mode, which will usually create a new instance of the activity when it is started, though this behavior may change with the introduction of other options such as Intent.FLAG_ACTIVITY_NEW_TASK.                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |</td>
+</tr>
+<tr>
+<td></td>
+<td> singleTop      </td>
+<td> 1     </td>
+<td> If, when starting the activity, there is already an instance of the same activity class in the foreground that is interacting with the user, then re-use that instance. This existing instance will receive a call to Activity.onNewIntent() with the new Intent that is being started.                                                                                                                                                                                                                                                                                                                                                                                       |</td>
+</tr>
+<tr>
+<td></td>
+<td> singleTask     </td>
+<td> 2     </td>
+<td> If, when starting the activity, there is already a task running that starts with this activity, then instead of starting a new instance the current task is brought to the front. The existing instance will receive a call to Activity.onNewIntent() with the new Intent that is being started, and with the Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT flag set. This is a superset of the singleTop mode, where if there is already an instance of the activity being started at the top of the stack, it will receive the Intent as described there (without the FLAG_ACTIVITY_BROUGHT_TO_FRONT flag set). See the Tasks and Back Stack document for more details about tasks. |</td>
+</tr>
+<tr>
+<td></td>
+<td> singleInstance </td>
+<td> 3     </td>
+<td> Only allow one instance of this activity to ever be running. This activity gets a unique task with only itself running in it; if it is ever launched again with the same Intent, then that task will be brought forward and its Activity.onNewIntent() method called. If this activity tries to start a new activity, that new activity will be launched in a separate task. See the Tasks and Back Stack document for more details about tasks.                                                                                                                                                                                                                              |</td>
+</tr>
+</tbody>
+</table>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Androidでローカル通知]]></title>
@@ -92,45 +272,6 @@ protected void onCreate(Bundle savedInstanceState) {
 <li><code>res/main/values-ja</code> 日本語ロケールでのValue</li>
 </ul>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[ボタンを押したときにコードを実行する]]></title>
-    <link href="http://site.piyox.info/blog/2014/04/21/android-activity/"/>
-    <updated>2014-04-21T20:47:12+09:00</updated>
-    <id>http://site.piyox.info/blog/2014/04/21/android-activity</id>
-    <content type="html"><![CDATA[<p>Androidをさわり始めた。</p>
-
-<p><code>xml
-&lt;Button
-  android:text="Button"
-  android:id="@+id/button"
-  android:layout_height="wrap_content"
-  android:layout_width="match_parent"
-/&gt;
-</code></p>
-
-<p>```java
-@Override
-protected void onCreate(Bundle savedInstanceState) {</p>
-
-<pre><code>super.onCreate(savedInstanceState);
-setContentView(R.layout.activity_main);
-
-Button button = (Button)findViewById(R.id.button);
-button.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View view) {
-        Intent intent = new Intent(MainActivity.this, SubActivity.class);
-        startActivity(intent);
-        // Toast.makeText(MainActivity.this, "test", Toast.LENGTH_LONG).show();
-    }
-});
-</code></pre>
-
-<p>}
-```</p>
 ]]></content>
   </entry>
   

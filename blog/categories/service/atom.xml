@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Service | xoyipメモ置き場]]></title>
+  <link href="http://site.piyox.info/blog/categories/service/atom.xml" rel="self"/>
+  <link href="http://site.piyox.info/"/>
+  <updated>2014-04-23T12:40:57+09:00</updated>
+  <id>http://site.piyox.info/</id>
+  <author>
+    <name><![CDATA[xoyip]]></name>
+    <email><![CDATA[xoyip@piyox.info]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Androidバックグラウンドでの定期処理]]></title>
+    <link href="http://site.piyox.info/blog/2014/04/23/android-alarm-service/"/>
+    <updated>2014-04-23T12:27:44+09:00</updated>
+    <id>http://site.piyox.info/blog/2014/04/23/android-alarm-service</id>
+    <content type="html"><![CDATA[<p>Androidでバックグランド処理を実行する方法。ここが簡潔にまとまっていていい。</p>
+
+<p><a href="http://android.keicode.com/basics/services-schedule-with-alarmmanager.php">AlarmService を利用したサービス実行のスケジューリング &ndash; Android 開発入門</a></p>
+
+<h1>サービスを登録・解除する画面</h1>
+
+<p>```java
+// MainActivity.java</p>
+
+<p>AlarmManager mManager;
+final static String TAG = &ldquo;AlarmService&rdquo;;</p>
+
+<p>// サービスの登録・解除で共通の処理
+private PendingIntent pendingIntent() {</p>
+
+<pre><code>Context context = getBaseContext();
+Intent intent = new Intent(context, AlarmService.class);
+PendingIntent pi = PendingIntent.getService(
+  context, -1, 
+  intent, PendingIntent.FLAG_UPDATE_CURRENT
+);
+return pi;
+</code></pre>
+
+<p>}</p>
+
+<p>// サービスを登録するときに呼び出せばOK
+private void scheduleService(){</p>
+
+<pre><code>mManager.setInexactRepeating(
+        AlarmManager.RTC,
+        System.currentTimeMillis(),
+        AlarmManager.INTERVAL_HOUR, // 1時間毎に呼び出す
+        pendingIntent()
+);
+</code></pre>
+
+<p>}</p>
+
+<p>// サービスを解除したいときに呼び出す
+private void cancelService(){</p>
+
+<pre><code>mManager.cancel(pendingIntent());
+</code></pre>
+
+<p>}
+```</p>
+
+<h1>サービス本体</h1>
+
+<p>```java
+// AlarmService.java</p>
+
+<p>public class AlarmService extends IntentService {</p>
+
+<pre><code>final static String TAG = "AlarmService";
+
+public AlarmService(){
+    super(TAG);
+}
+
+@Override
+protected void onHandleIntent(Intent intent) {
+    Log.d(TAG, "onHandleIntent");
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<h1>AndroidManifest.xml</h1>
+
+<p>AndroidManifest.xmlにサービスについて記載が必要なので、</p>
+
+<p>```xml
+<application></p>
+
+<pre><code>&lt;activity&gt;
+&lt;/activity&gt;
+&lt;service android:name=".AlarmService" /&gt; &lt;!-- この行！ --&gt;
+</code></pre>
+
+<p></application>
+```</p>
+]]></content>
+  </entry>
+  
+</feed>

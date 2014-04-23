@@ -4,7 +4,7 @@
   <title><![CDATA[xoyipメモ置き場]]></title>
   <link href="http://site.piyox.info/atom.xml" rel="self"/>
   <link href="http://site.piyox.info/"/>
-  <updated>2014-04-22T16:20:32+09:00</updated>
+  <updated>2014-04-23T12:40:57+09:00</updated>
   <id>http://site.piyox.info/</id>
   <author>
     <name><![CDATA[xoyip]]></name>
@@ -12,6 +12,241 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Androidバックグラウンドでの定期処理]]></title>
+    <link href="http://site.piyox.info/blog/2014/04/23/android-alarm-service/"/>
+    <updated>2014-04-23T12:27:44+09:00</updated>
+    <id>http://site.piyox.info/blog/2014/04/23/android-alarm-service</id>
+    <content type="html"><![CDATA[<p>Androidでバックグランド処理を実行する方法。ここが簡潔にまとまっていていい。</p>
+
+<p><a href="http://android.keicode.com/basics/services-schedule-with-alarmmanager.php">AlarmService を利用したサービス実行のスケジューリング &ndash; Android 開発入門</a></p>
+
+<h1>サービスを登録・解除する画面</h1>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">// MainActivity.java</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">AlarmManager</span> <span class="n">mManager</span><span class="o">;</span>
+</span><span class='line'><span class="kd">final</span> <span class="kd">static</span> <span class="n">String</span> <span class="n">TAG</span> <span class="o">=</span> <span class="s">&quot;AlarmService&quot;</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// サービスの登録・解除で共通の処理</span>
+</span><span class='line'><span class="kd">private</span> <span class="n">PendingIntent</span> <span class="nf">pendingIntent</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">Context</span> <span class="n">context</span> <span class="o">=</span> <span class="n">getBaseContext</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Intent</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="n">AlarmService</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">PendingIntent</span> <span class="n">pi</span> <span class="o">=</span> <span class="n">PendingIntent</span><span class="o">.</span><span class="na">getService</span><span class="o">(</span>
+</span><span class='line'>      <span class="n">context</span><span class="o">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">,</span>
+</span><span class='line'>      <span class="n">intent</span><span class="o">,</span> <span class="n">PendingIntent</span><span class="o">.</span><span class="na">FLAG_UPDATE_CURRENT</span>
+</span><span class='line'>    <span class="o">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">pi</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// サービスを登録するときに呼び出せばOK</span>
+</span><span class='line'><span class="kd">private</span> <span class="kt">void</span> <span class="nf">scheduleService</span><span class="o">(){</span>
+</span><span class='line'>    <span class="n">mManager</span><span class="o">.</span><span class="na">setInexactRepeating</span><span class="o">(</span>
+</span><span class='line'>            <span class="n">AlarmManager</span><span class="o">.</span><span class="na">RTC</span><span class="o">,</span>
+</span><span class='line'>            <span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">(),</span>
+</span><span class='line'>            <span class="n">AlarmManager</span><span class="o">.</span><span class="na">INTERVAL_HOUR</span><span class="o">,</span> <span class="c1">// 1時間毎に呼び出す</span>
+</span><span class='line'>            <span class="n">pendingIntent</span><span class="o">()</span>
+</span><span class='line'>    <span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// サービスを解除したいときに呼び出す</span>
+</span><span class='line'><span class="kd">private</span> <span class="kt">void</span> <span class="nf">cancelService</span><span class="o">(){</span>
+</span><span class='line'>    <span class="n">mManager</span><span class="o">.</span><span class="na">cancel</span><span class="o">(</span><span class="n">pendingIntent</span><span class="o">());</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>サービス本体</h1>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">// AlarmService.java</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AlarmService</span> <span class="kd">extends</span> <span class="n">IntentService</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">final</span> <span class="kd">static</span> <span class="n">String</span> <span class="n">TAG</span> <span class="o">=</span> <span class="s">&quot;AlarmService&quot;</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="nf">AlarmService</span><span class="o">(){</span>
+</span><span class='line'>        <span class="kd">super</span><span class="o">(</span><span class="n">TAG</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onHandleIntent</span><span class="o">(</span><span class="n">Intent</span> <span class="n">intent</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">Log</span><span class="o">.</span><span class="na">d</span><span class="o">(</span><span class="n">TAG</span><span class="o">,</span> <span class="s">&quot;onHandleIntent&quot;</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>AndroidManifest.xml</h1>
+
+<p>AndroidManifest.xmlにサービスについて記載が必要なので、</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;application&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;activity&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/activity&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;service</span> <span class="na">android:name=</span><span class="s">&quot;.AlarmService&quot;</span> <span class="nt">/&gt;</span> <span class="c">&lt;!-- この行！ --&gt;</span>
+</span><span class='line'><span class="nt">&lt;/application&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Androidで通知からアプリを起動する方法]]></title>
+    <link href="http://site.piyox.info/blog/2014/04/22/android-pending-intent/"/>
+    <updated>2014-04-22T16:41:08+09:00</updated>
+    <id>http://site.piyox.info/blog/2014/04/22/android-pending-intent</id>
+    <content type="html"><![CDATA[<p>  通知オブジェクトを作る際に<code>PendingIntent</code>を絡めておけば良い。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Intent</span><span class="o">(</span><span class="n">MainActivity</span><span class="o">.</span><span class="na">this</span><span class="o">,</span> <span class="n">MainActivity</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'><span class="n">PendingIntent</span> <span class="n">pi</span> <span class="o">=</span> <span class="n">PendingIntent</span><span class="o">.</span><span class="na">getActivity</span><span class="o">(</span><span class="n">MainActivity</span><span class="o">.</span><span class="na">this</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">intent</span><span class="o">,</span> <span class="n">Intent</span><span class="o">.</span><span class="na">FLAG_ACTIVITY_NEW_TASK</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// notification</span>
+</span><span class='line'><span class="n">NotificationManager</span> <span class="n">nm</span> <span class="o">=</span> <span class="o">(</span><span class="n">NotificationManager</span><span class="o">)</span><span class="n">getSystemService</span><span class="o">(</span><span class="n">Context</span><span class="o">.</span><span class="na">NOTIFICATION_SERVICE</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">Notification</span> <span class="n">n</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Notification</span><span class="o">.</span><span class="na">Builder</span><span class="o">(</span><span class="n">MainActivity</span><span class="o">.</span><span class="na">this</span><span class="o">)</span>
+</span><span class='line'>        <span class="o">.</span><span class="na">setContentTitle</span><span class="o">(</span><span class="s">&quot;I&#39;m xoyip&quot;</span><span class="o">)</span>
+</span><span class='line'>        <span class="o">.</span><span class="na">setContentText</span><span class="o">(</span><span class="s">&quot;Notification From XOYIP!&quot;</span><span class="o">)</span>
+</span><span class='line'>        <span class="o">.</span><span class="na">setSmallIcon</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">drawable</span><span class="o">.</span><span class="na">ic_launcher</span><span class="o">)</span>
+</span><span class='line'>        <span class="o">.</span><span class="na">setContentIntent</span><span class="o">(</span><span class="n">pi</span><span class="o">)</span>
+</span><span class='line'>        <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">nm</span><span class="o">.</span><span class="na">notify</span><span class="o">(</span><span class="n">uniq_number</span><span class="o">,</span> <span class="n">n</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ただしこれだけだと通知から起動するときに既存のアクティビティがあったとしても、新たなアクティビティが生成される仕組みになっているので<code>AndroidManifest.xml</code>でアクティビティの設定を変えてあげる必要がある。</p>
+
+<p><code>android:launchMode</code>を<code>singleTop</code>などにすれば既存のアクティビティが再利用されるっぽい。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;activity</span>
+</span><span class='line'>    <span class="na">android:name=</span><span class="s">&quot;com.xoyip.app.MainActivity&quot;</span>
+</span><span class='line'>    <span class="na">android:label=</span><span class="s">&quot;@string/app_name&quot;</span>
+</span><span class='line'>    <span class="na">android:launchMode=</span><span class="s">&quot;singleTop&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;intent-filter&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;action</span> <span class="na">android:name=</span><span class="s">&quot;android.intent.action.MAIN&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nt">&lt;category</span> <span class="na">android:name=</span><span class="s">&quot;android.intent.category.LAUNCHER&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/intent-filter&gt;</span>
+</span><span class='line'><span class="nt">&lt;/activity&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>参考</h1>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th> Constant       </th>
+<th> Value </th>
+<th> Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td> standard       </td>
+<td> 0     </td>
+<td> The default mode, which will usually create a new instance of the activity when it is started, though this behavior may change with the introduction of other options such as Intent.FLAG_ACTIVITY_NEW_TASK.                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |</td>
+</tr>
+<tr>
+<td></td>
+<td> singleTop      </td>
+<td> 1     </td>
+<td> If, when starting the activity, there is already an instance of the same activity class in the foreground that is interacting with the user, then re-use that instance. This existing instance will receive a call to Activity.onNewIntent() with the new Intent that is being started.                                                                                                                                                                                                                                                                                                                                                                                       |</td>
+</tr>
+<tr>
+<td></td>
+<td> singleTask     </td>
+<td> 2     </td>
+<td> If, when starting the activity, there is already a task running that starts with this activity, then instead of starting a new instance the current task is brought to the front. The existing instance will receive a call to Activity.onNewIntent() with the new Intent that is being started, and with the Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT flag set. This is a superset of the singleTop mode, where if there is already an instance of the activity being started at the top of the stack, it will receive the Intent as described there (without the FLAG_ACTIVITY_BROUGHT_TO_FRONT flag set). See the Tasks and Back Stack document for more details about tasks. |</td>
+</tr>
+<tr>
+<td></td>
+<td> singleInstance </td>
+<td> 3     </td>
+<td> Only allow one instance of this activity to ever be running. This activity gets a unique task with only itself running in it; if it is ever launched again with the same Intent, then that task will be brought forward and its Activity.onNewIntent() method called. If this activity tries to start a new activity, that new activity will be launched in a separate task. See the Tasks and Back Stack document for more details about tasks.                                                                                                                                                                                                                              |</td>
+</tr>
+</tbody>
+</table>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Androidでローカル通知]]></title>

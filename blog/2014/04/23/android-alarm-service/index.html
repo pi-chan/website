@@ -1,0 +1,259 @@
+
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Androidバックグラウンドでの定期処理 - xoyipメモ置き場</title>
+	<meta name="author" content="xoyip">
+
+	
+	<meta name="description" content="Androidバックグラウンドでの定期処理 Androidでバックグランド処理を実行する方法。ここが簡潔にまとまっていていい。 AlarmService を利用したサービス実行のスケジューリング &ndash; Android 開発入門 サービスを登録・解除する画面 1
+2
+3
+4
+5
+6
+7 &hellip;">
+	
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="xoyipメモ置き場" type="application/atom+xml">
+	
+	<link rel="canonical" href="http://site.piyox.info/blog/2014/04/23/android-alarm-service/">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<link href="/stylesheets/font-awesome.min.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<link href='http://fonts.googleapis.com/css?family=Nunito:400,300,700' rel='stylesheet' type='text/css'>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+  
+
+</head>
+
+
+<body>
+	<div class="container">
+		<div class="left-col">
+			<div class="intrude-less">
+			<header id="header" class="inner"><div class="profilepic">
+	
+	<img src="http://www.gravatar.com/avatar/8f2d6bbbafa2bd93581f59b219138669?s=160" alt="Profile Picture" style="width: 160px;" />
+	
+</div>
+
+<nav id="main-nav"><ul class="main">
+    <li><a href="/">Home</a></li>
+    <li><a href="/blog/archives">Archives</a></li>
+    <li><a href="http://xoyip.hatenablog.com/">Hatena Blog</a></li>
+    <li><a href="http://xoyip.hatenablog.com/entry/2014/01/01/204123">About</a></li>
+</ul>
+
+<section class="aboutme">
+  <p>
+    学んだことをメモっておくところ
+  </p>
+</section>
+</nav>
+<nav id="sub-nav">
+	<div class="social">
+		
+			<a class="email" href="mailto:xoyip@piyox.info" title="Email">Email</a>
+		
+		
+		
+		
+			<a class="twitter" href="http://twitter.com/xoyip" title="Twitter">Twitter</a>
+		
+		
+			<a class="github" href="https://github.com/xoyip" title="GitHub">GitHub</a>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+    	
+    	
+			<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+	</div>
+</nav>
+</header>				
+			</div>
+		</div>	
+		<div class="mid-col">
+			
+				
+			
+			<div class="mid-col-container">
+				<div id="content" class="inner"><article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+	<h1 class="title" itemprop="name">Androidバックグラウンドでの定期処理</h1>
+	<div class="entry-content" itemprop="articleBody"><p>Androidでバックグランド処理を実行する方法。ここが簡潔にまとまっていていい。</p>
+
+<p><a href="http://android.keicode.com/basics/services-schedule-with-alarmmanager.php">AlarmService を利用したサービス実行のスケジューリング &ndash; Android 開発入門</a></p>
+
+<h1>サービスを登録・解除する画面</h1>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">// MainActivity.java</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">AlarmManager</span> <span class="n">mManager</span><span class="o">;</span>
+</span><span class='line'><span class="kd">final</span> <span class="kd">static</span> <span class="n">String</span> <span class="n">TAG</span> <span class="o">=</span> <span class="s">&quot;AlarmService&quot;</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// サービスの登録・解除で共通の処理</span>
+</span><span class='line'><span class="kd">private</span> <span class="n">PendingIntent</span> <span class="nf">pendingIntent</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">Context</span> <span class="n">context</span> <span class="o">=</span> <span class="n">getBaseContext</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Intent</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="n">AlarmService</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">PendingIntent</span> <span class="n">pi</span> <span class="o">=</span> <span class="n">PendingIntent</span><span class="o">.</span><span class="na">getService</span><span class="o">(</span>
+</span><span class='line'>      <span class="n">context</span><span class="o">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">,</span>
+</span><span class='line'>      <span class="n">intent</span><span class="o">,</span> <span class="n">PendingIntent</span><span class="o">.</span><span class="na">FLAG_UPDATE_CURRENT</span>
+</span><span class='line'>    <span class="o">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">pi</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// サービスを登録するときに呼び出せばOK</span>
+</span><span class='line'><span class="kd">private</span> <span class="kt">void</span> <span class="nf">scheduleService</span><span class="o">(){</span>
+</span><span class='line'>    <span class="n">mManager</span><span class="o">.</span><span class="na">setInexactRepeating</span><span class="o">(</span>
+</span><span class='line'>            <span class="n">AlarmManager</span><span class="o">.</span><span class="na">RTC</span><span class="o">,</span>
+</span><span class='line'>            <span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">(),</span>
+</span><span class='line'>            <span class="n">AlarmManager</span><span class="o">.</span><span class="na">INTERVAL_HOUR</span><span class="o">,</span> <span class="c1">// 1時間毎に呼び出す</span>
+</span><span class='line'>            <span class="n">pendingIntent</span><span class="o">()</span>
+</span><span class='line'>    <span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// サービスを解除したいときに呼び出す</span>
+</span><span class='line'><span class="kd">private</span> <span class="kt">void</span> <span class="nf">cancelService</span><span class="o">(){</span>
+</span><span class='line'>    <span class="n">mManager</span><span class="o">.</span><span class="na">cancel</span><span class="o">(</span><span class="n">pendingIntent</span><span class="o">());</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>サービス本体</h1>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">// AlarmService.java</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AlarmService</span> <span class="kd">extends</span> <span class="n">IntentService</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">final</span> <span class="kd">static</span> <span class="n">String</span> <span class="n">TAG</span> <span class="o">=</span> <span class="s">&quot;AlarmService&quot;</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="nf">AlarmService</span><span class="o">(){</span>
+</span><span class='line'>        <span class="kd">super</span><span class="o">(</span><span class="n">TAG</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onHandleIntent</span><span class="o">(</span><span class="n">Intent</span> <span class="n">intent</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">Log</span><span class="o">.</span><span class="na">d</span><span class="o">(</span><span class="n">TAG</span><span class="o">,</span> <span class="s">&quot;onHandleIntent&quot;</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>AndroidManifest.xml</h1>
+
+<p>AndroidManifest.xmlにサービスについて記載が必要なので、</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;application&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;activity&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/activity&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;service</span> <span class="na">android:name=</span><span class="s">&quot;.AlarmService&quot;</span> <span class="nt">/&gt;</span> <span class="c">&lt;!-- この行！ --&gt;</span>
+</span><span class='line'><span class="nt">&lt;/application&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	
+	<a class="addthis_counter addthis_pill_style"></a>
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid="></script>
+</div>
+
+
+</div>
+			</div>
+			<footer id="footer" class="inner">Copyright &copy; 2014
+
+    xoyip
+
+
+Design credit: <a href="http://shashankmehta.in/archive/2012/greyshade.html">Shashank Mehta</a></footer>
+		</div>
+	</div>
+	
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

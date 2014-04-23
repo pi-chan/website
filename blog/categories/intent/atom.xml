@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Android | xoyipメモ置き場]]></title>
-  <link href="http://site.piyox.info/blog/categories/android/atom.xml" rel="self"/>
+  <title><![CDATA[Category: Intent | xoyipメモ置き場]]></title>
+  <link href="http://site.piyox.info/blog/categories/intent/atom.xml" rel="self"/>
   <link href="http://site.piyox.info/"/>
   <updated>2014-04-23T12:40:57+09:00</updated>
   <id>http://site.piyox.info/</id>
@@ -12,98 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[Androidバックグラウンドでの定期処理]]></title>
-    <link href="http://site.piyox.info/blog/2014/04/23/android-alarm-service/"/>
-    <updated>2014-04-23T12:27:44+09:00</updated>
-    <id>http://site.piyox.info/blog/2014/04/23/android-alarm-service</id>
-    <content type="html"><![CDATA[<p>Androidでバックグランド処理を実行する方法。ここが簡潔にまとまっていていい。</p>
-
-<p><a href="http://android.keicode.com/basics/services-schedule-with-alarmmanager.php">AlarmService を利用したサービス実行のスケジューリング &ndash; Android 開発入門</a></p>
-
-<h1>サービスを登録・解除する画面</h1>
-
-<p>```java
-// MainActivity.java</p>
-
-<p>AlarmManager mManager;
-final static String TAG = &ldquo;AlarmService&rdquo;;</p>
-
-<p>// サービスの登録・解除で共通の処理
-private PendingIntent pendingIntent() {</p>
-
-<pre><code>Context context = getBaseContext();
-Intent intent = new Intent(context, AlarmService.class);
-PendingIntent pi = PendingIntent.getService(
-  context, -1, 
-  intent, PendingIntent.FLAG_UPDATE_CURRENT
-);
-return pi;
-</code></pre>
-
-<p>}</p>
-
-<p>// サービスを登録するときに呼び出せばOK
-private void scheduleService(){</p>
-
-<pre><code>mManager.setInexactRepeating(
-        AlarmManager.RTC,
-        System.currentTimeMillis(),
-        AlarmManager.INTERVAL_HOUR, // 1時間毎に呼び出す
-        pendingIntent()
-);
-</code></pre>
-
-<p>}</p>
-
-<p>// サービスを解除したいときに呼び出す
-private void cancelService(){</p>
-
-<pre><code>mManager.cancel(pendingIntent());
-</code></pre>
-
-<p>}
-```</p>
-
-<h1>サービス本体</h1>
-
-<p>```java
-// AlarmService.java</p>
-
-<p>public class AlarmService extends IntentService {</p>
-
-<pre><code>final static String TAG = "AlarmService";
-
-public AlarmService(){
-    super(TAG);
-}
-
-@Override
-protected void onHandleIntent(Intent intent) {
-    Log.d(TAG, "onHandleIntent");
-}
-</code></pre>
-
-<p>}
-```</p>
-
-<h1>AndroidManifest.xml</h1>
-
-<p>AndroidManifest.xmlにサービスについて記載が必要なので、</p>
-
-<p>```xml
-<application></p>
-
-<pre><code>&lt;activity&gt;
-&lt;/activity&gt;
-&lt;service android:name=".AlarmService" /&gt; &lt;!-- この行！ --&gt;
-</code></pre>
-
-<p></application>
-```</p>
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[Androidで通知からアプリを起動する方法]]></title>
@@ -189,88 +97,6 @@ android:launchMode="singleTop"&gt;
 </tr>
 </tbody>
 </table>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Androidでローカル通知]]></title>
-    <link href="http://site.piyox.info/blog/2014/04/22/android-notification/"/>
-    <updated>2014-04-22T15:03:03+09:00</updated>
-    <id>http://site.piyox.info/blog/2014/04/22/android-notification</id>
-    <content type="html"><![CDATA[<p>```java
-// defined somewhere
-private int number = 0;</p>
-
-<p>// notification
-NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);</p>
-
-<p>Notification n = new Notification.Builder(MainActivity.this)</p>
-
-<pre><code>    .setContentTitle("I'm xoyip")
-    .setContentText("Notification From XOYIP!")
-    .setSmallIcon(R.drawable.ic_launcher)
-    .build();
-</code></pre>
-
-<p>nm.notify(number, n);
-++number;
-```</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Androidで遅延実行。iOSのPerformSelectorみたいなやつ]]></title>
-    <link href="http://site.piyox.info/blog/2014/04/22/android-post-delay/"/>
-    <updated>2014-04-22T14:55:43+09:00</updated>
-    <id>http://site.piyox.info/blog/2014/04/22/android-post-delay</id>
-    <content type="html"><![CDATA[<p>```java
-import android.os.Handler; // import java.util.logging.Handler;ではない！！</p>
-
-<p>public class MainActivity extends ActionBarActivity {</p>
-
-<pre><code>@Override
-protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main);
-
-    Button b = (Button)findViewById(R.id.button_action);
-    b.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-
-            Runnable task = new Runnable() {
-                @Override
-                public void run() {
-                    Log.d("MainActivity", "Run!");
-                }
-            };
-
-            // Runnable, Millisecond
-            new Handler().postDelayed(task, 1000);
-            Log.d("MainActivity", "Button Clicked");
-        }
-    });
-}
-</code></pre>
-
-<p>}
-```</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Androidのリソースに関するメモ]]></title>
-    <link href="http://site.piyox.info/blog/2014/04/22/android-resource/"/>
-    <updated>2014-04-22T12:46:23+09:00</updated>
-    <id>http://site.piyox.info/blog/2014/04/22/android-resource</id>
-    <content type="html"><![CDATA[<p>Androidのリソースを追加するときは<code>src/main/res</code>以下にディレクトリを掘って行う。</p>
-
-<ul>
-<li><code>res/main/drawable</code>  画像全般</li>
-<li><code>res/main/values</code>    デフォルトのValue、文字列など</li>
-<li><code>res/main/values-ja</code> 日本語ロケールでのValue</li>
-</ul>
 
 ]]></content>
   </entry>
