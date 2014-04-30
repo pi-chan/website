@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Login | xoyipメモ置き場]]></title>
+  <link href="http://site.piyox.info/blog/categories/login/atom.xml" rel="self"/>
+  <link href="http://site.piyox.info/"/>
+  <updated>2014-04-30T11:16:13+09:00</updated>
+  <id>http://site.piyox.info/</id>
+  <author>
+    <name><![CDATA[xoyip]]></name>
+    <email><![CDATA[xoyip@piyox.info]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[AndroidでGoogleアカウントを選択]]></title>
+    <link href="http://site.piyox.info/blog/2014/04/30/android-accountpicker/"/>
+    <updated>2014-04-30T11:09:00+09:00</updated>
+    <id>http://site.piyox.info/blog/2014/04/30/android-accountpicker</id>
+    <content type="html"><![CDATA[<h1>ログインボタン</h1>
+
+<p>↓を実行。</p>
+
+<p>```java
+Intent intent = AccountPicker.newChooseAccountIntent(null, null, new String[]{&ldquo;com.google&rdquo;},</p>
+
+<pre><code>    false, null, null, null, null);
+</code></pre>
+
+<p>startActivityForResult(intent, PICK_ACCOUNT_REQUEST);
+```</p>
+
+<h1>処理が終わったら</h1>
+
+<p>選択されたアカウントを選び、そのアカウント名でTokenを取得。</p>
+
+<p>```java
+case PICK_ACCOUNT_REQUEST:</p>
+
+<pre><code>if (resultCode == RESULT_OK) {
+    String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+    LOG.debug("Selected Account {}", accountName);
+    selectedAccount =  null;
+    for (Account a:list) {
+        if (a.name.equals(accountName)) {
+            selectedAccount = a;
+            break;
+        }
+    }
+    selectedAccountName = accountName;
+    am.getAuthToken(
+            selectedAccount,       // Account retrieved using getAccountsByType()
+            "lh2",                 // Auth scope
+            null,                  // Authenticator-specific options
+            this,                  // Your activity
+            new OnTokenAcquired(), // Callback called when a token is successfully acquired
+            null);                 // Callback called if an error occ
+}
+break;
+</code></pre>
+
+<p>```</p>
+]]></content>
+  </entry>
+  
+</feed>
