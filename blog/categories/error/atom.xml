@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Error | xoyipメモ置き場]]></title>
+  <link href="http://site.piyox.info/blog/categories/error/atom.xml" rel="self"/>
+  <link href="http://site.piyox.info/"/>
+  <updated>2014-04-30T11:19:58+09:00</updated>
+  <id>http://site.piyox.info/</id>
+  <author>
+    <name><![CDATA[xoyip]]></name>
+    <email><![CDATA[xoyip@piyox.info]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[duplicate files copied in apk]]></title>
+    <link href="http://site.piyox.info/blog/2014/04/30/android-duplicate-copy/"/>
+    <updated>2014-04-30T11:18:10+09:00</updated>
+    <id>http://site.piyox.info/blog/2014/04/30/android-duplicate-copy</id>
+    <content type="html"><![CDATA[<p><code>duplicate files copied in apk</code>が出た時は怒られた対象のファイルをbuild.gradleで<code>exclude</code>すれば回避できる。</p>
+
+<p>```javascript
+android {</p>
+
+<pre><code>packagingOptions {
+    exclude 'META-INF/LICENSE.txt'
+}
+</code></pre>
+
+<p>}
+```</p>
+]]></content>
+  </entry>
+  
+</feed>
