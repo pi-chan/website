@@ -4,7 +4,7 @@
   <title><![CDATA[xoyipメモ置き場]]></title>
   <link href="http://site.piyox.info/atom.xml" rel="self"/>
   <link href="http://site.piyox.info/"/>
-  <updated>2014-04-30T11:19:58+09:00</updated>
+  <updated>2014-05-22T15:46:00+09:00</updated>
   <id>http://site.piyox.info/</id>
   <author>
     <name><![CDATA[xoyip]]></name>
@@ -12,6 +12,147 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[activesupport-4.1.1/lib/active_support.rb]]></title>
+    <link href="http://site.piyox.info/blog/2014/05/22/active-support-dot-rb/"/>
+    <updated>2014-05-22T13:34:07+09:00</updated>
+    <id>http://site.piyox.info/blog/2014/05/22/active-support-dot-rb</id>
+    <content type="html"><![CDATA[<p>各種モジュールを<code>ActiveSupport::Autoload#autoload</code>メソッドで読み込む仕事が全て。</p>
+
+<h1>ActiveSupport::Autoload#autoload</h1>
+
+<p>単なる<code>autoload</code>は、実質的にrubyの<code>autoload</code>に相当しており、<code>eager_autoload</code>ブロック内の<code>autoload</code>は実質的には<code>require</code>になる。</p>
+
+<p>ActiveSupportのautoloadはRuby組み込みのautoloadと異なる2つの特徴を持つ。</p>
+
+<ul>
+<li>規約により第二引数のパスを省略できる</li>
+<li>eager_autoloadブロック内ではrequire相当の動きをする</li>
+</ul>
+
+
+<h2>Rubyにおけるrequireとautoloadの違い</h2>
+
+<p><code>require</code>は即座にロード、<code>autoload</code>は必要になったときにロード。</p>
+
+<h1>サンプルコード</h1>
+
+<p>どんな動きになるかを実際に試してみる。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># main.rb</span>
+</span><span class='line'><span class="nb">require</span> <span class="s2">&quot;rubygems&quot;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s2">&quot;bundler/setup&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">require</span> <span class="s2">&quot;pry&quot;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s2">&quot;active_support/dependencies/autoload&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="vg">$:</span><span class="o">.</span><span class="n">unshift</span> <span class="no">File</span><span class="o">.</span><span class="n">expand_path</span> <span class="s2">&quot;./&quot;</span><span class="p">,</span> <span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">module</span> <span class="nn">Xoyip</span>
+</span><span class='line'>  <span class="kp">extend</span> <span class="ss">ActiveSupport</span><span class="p">:</span><span class="ss">:Autoload</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nb">autoload</span> <span class="ss">:Hoge</span>
+</span><span class='line'>  <span class="n">eager_autoload</span> <span class="k">do</span>
+</span><span class='line'>    <span class="nb">autoload</span> <span class="ss">:Fuga</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Xoyip</span><span class="o">.</span><span class="n">eager_load!</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">puts</span> <span class="s2">&quot;after calling &#39;Xoyip.eager_load!&#39;&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">h</span> <span class="o">=</span> <span class="ss">Xoyip</span><span class="p">:</span><span class="ss">:Hoge</span><span class="o">.</span><span class="n">new</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># xoyip/hoge.rb</span>
+</span><span class='line'><span class="nb">puts</span> <span class="s2">&quot;loading Hoge&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">module</span> <span class="nn">Xoyip</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Hoge</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">hoge</span>
+</span><span class='line'>      <span class="nb">puts</span> <span class="s2">&quot;hoge&quot;</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># xoyip/fuga.rb</span>
+</span><span class='line'><span class="nb">puts</span> <span class="s2">&quot;loading Fuga&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">module</span> <span class="nn">Xoyip</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Fuga</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">fuga</span>
+</span><span class='line'>      <span class="nb">puts</span> <span class="s2">&quot;fuga&quot;</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>実行結果</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="sx">% ruby </span><span class="n">main</span><span class="o">.</span><span class="n">rb</span>
+</span><span class='line'><span class="n">loading</span> <span class="no">Fuga</span>
+</span><span class='line'><span class="n">after</span> <span class="n">calling</span> <span class="s1">&#39;Xoyip.eager_load!&#39;</span>
+</span><span class='line'><span class="n">loading</span> <span class="no">Hoge</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[duplicate files copied in apk]]></title>

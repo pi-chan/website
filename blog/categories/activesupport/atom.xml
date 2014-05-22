@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: ActiveSupport | xoyipメモ置き場]]></title>
+  <link href="http://site.piyox.info/blog/categories/activesupport/atom.xml" rel="self"/>
+  <link href="http://site.piyox.info/"/>
+  <updated>2014-05-22T15:46:00+09:00</updated>
+  <id>http://site.piyox.info/</id>
+  <author>
+    <name><![CDATA[xoyip]]></name>
+    <email><![CDATA[xoyip@piyox.info]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[activesupport-4.1.1/lib/active_support.rb]]></title>
+    <link href="http://site.piyox.info/blog/2014/05/22/active-support-dot-rb/"/>
+    <updated>2014-05-22T13:34:07+09:00</updated>
+    <id>http://site.piyox.info/blog/2014/05/22/active-support-dot-rb</id>
+    <content type="html"><![CDATA[<p>各種モジュールを<code>ActiveSupport::Autoload#autoload</code>メソッドで読み込む仕事が全て。</p>
+
+<h1>ActiveSupport::Autoload#autoload</h1>
+
+<p>単なる<code>autoload</code>は、実質的にrubyの<code>autoload</code>に相当しており、<code>eager_autoload</code>ブロック内の<code>autoload</code>は実質的には<code>require</code>になる。</p>
+
+<p>ActiveSupportのautoloadはRuby組み込みのautoloadと異なる2つの特徴を持つ。</p>
+
+<ul>
+<li>規約により第二引数のパスを省略できる</li>
+<li>eager_autoloadブロック内ではrequire相当の動きをする</li>
+</ul>
+
+
+<h2>Rubyにおけるrequireとautoloadの違い</h2>
+
+<p><code>require</code>は即座にロード、<code>autoload</code>は必要になったときにロード。</p>
+
+<h1>サンプルコード</h1>
+
+<p>どんな動きになるかを実際に試してみる。</p>
+
+<p>```ruby</p>
+
+<h1>main.rb</h1>
+
+<p>require &ldquo;rubygems&rdquo;
+require &ldquo;bundler/setup&rdquo;</p>
+
+<p>require &ldquo;pry&rdquo;
+require &ldquo;active_support/dependencies/autoload&rdquo;</p>
+
+<p>$:.unshift File.expand_path &ldquo;./&rdquo;, File.dirname(<strong>FILE</strong>)</p>
+
+<p>module Xoyip
+  extend ActiveSupport::Autoload</p>
+
+<p>  autoload :Hoge
+  eager_autoload do</p>
+
+<pre><code>autoload :Fuga
+</code></pre>
+
+<p>  end
+end</p>
+
+<p>Xoyip.eager_load!</p>
+
+<p>puts &ldquo;after calling &lsquo;Xoyip.eager_load!&rsquo;&rdquo;</p>
+
+<p>h = Xoyip::Hoge.new
+```</p>
+
+<p>```ruby</p>
+
+<h1>xoyip/hoge.rb</h1>
+
+<p>puts &ldquo;loading Hoge&rdquo;</p>
+
+<p>module Xoyip
+  class Hoge</p>
+
+<pre><code>def hoge
+  puts "hoge"
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>```ruby</p>
+
+<h1>xoyip/fuga.rb</h1>
+
+<p>puts &ldquo;loading Fuga&rdquo;</p>
+
+<p>module Xoyip
+  class Fuga</p>
+
+<pre><code>def fuga
+  puts "fuga"
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<h2>実行結果</h2>
+
+<p><code>
+% ruby main.rb
+loading Fuga
+after calling 'Xoyip.eager_load!'
+loading Hoge
+</code></p>
+]]></content>
+  </entry>
+  
+</feed>
